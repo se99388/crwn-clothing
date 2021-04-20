@@ -4,7 +4,7 @@ import { persistStore } from "redux-persist";
 import combineReducers from "./root-reducer";
 import { composeWithDevTools } from "redux-devtools-extension";
 
-const middelwares = [/*logger*/];
+const middelwares = [logger];
 export const store = createStore(
   combineReducers,
   composeWithDevTools(applyMiddleware(...middelwares))
