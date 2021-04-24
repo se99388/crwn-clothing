@@ -12,6 +12,40 @@ const config = {
   measurementId: "G-L8W5GDNZTX",
 };
 
+//this is a function which add a new collection and its documents to firebase
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = firestore.collection(collectionKey);
+  const batch = firestore.batch();
+
+  objectsToAdd.forEach((obj) => {
+    const newDocRef = collectionRef.doc();
+    batch.set(newDocRef, obj);
+    console.log(newDocRef);
+  });
+
+  return batch.commit();
+};
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+  const transformedCollection = collections.docs.map((doc) => {
+    const { items, title } = doc.data();
+    return {
+      items,
+      title,
+      routeName: encodeURI(title.toLowerCase()),
+      id: doc.id,
+    };
+  });
+
+  return transformedCollection.reduce((accum, collection) => {
+    accum[collection.title.toLowerCase()] = collection;
+    return accum;
+  }, {});
+};
+
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
   const userRef = firestore.doc(`users/${userAuth.uid}`);
