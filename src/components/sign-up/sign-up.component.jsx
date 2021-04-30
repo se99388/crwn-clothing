@@ -1,7 +1,9 @@
 import { Component } from "react";
+import { connect } from "react-redux";
 import CustomButton from "../custom-button/custom-button.component";
 import FormInput from "../form-input/form-input.component";
 
+import { signUpStart } from "../../redux/user/user.actions";
 import {
   auth,
   createUserProfileDocument,
@@ -29,39 +31,40 @@ class SignUp extends Component {
 
   handleSubmit = async (e) => {
     e.preventDefault();
+    const { signUpStart } = this.props;
     const { displayName, email, password, confirmPassword } = this.state;
     if (password !== confirmPassword) {
       alert(`passwords don't match`);
       return;
     }
+    signUpStart({ displayName, email, password });
+    // try {
+    // //create a new auth user in the firebase
+    // const { user } = await auth.createUserWithEmailAndPassword(
+    //   email,
+    //   password
+    // );
 
-    try {
-      //create a new auth user in the firebase
-      const { user } = await auth.createUserWithEmailAndPassword(
-        email,
-        password
-      );
+    // //add the new user to the 'users' collection (if it is not exist yet)
+    // await createUserProfileDocument(user, { displayName });
+    //   this.setState({
+    //     displayName: "",
+    //     email: "",
+    //     password: "",
+    //     confirmPassword: "",
+    //   });
+    // } catch (error) {
+    //   var errorCode = error.code;
+    //   var errorMessage = error.message;
+    //   if (errorCode === "auth/weak-password") {
+    //     alert("The password is too weak.");
+    //   } else {
+    //     alert(errorMessage);
+    //   }
+    //   console.log(error);
+    // }
 
-      //add the new user to the 'users' collection (if it is not exist yet)
-      await createUserProfileDocument(user, { displayName });
-      this.setState({
-        displayName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      if (errorCode === "auth/weak-password") {
-        alert("The password is too weak.");
-      } else {
-        alert(errorMessage);
-      }
-      console.log(error);
-    }
-
-    console.log(this.state);
+    // console.log(this.state);
   };
 
   render() {
@@ -112,4 +115,7 @@ class SignUp extends Component {
   }
 }
 
-export default SignUp;
+const mapDispatchToProps = (dispatch) => ({
+  signUpStart: (userCredentials) => dispatch(signUpStart(userCredentials)),
+});
+export default connect(null, mapDispatchToProps)(SignUp);

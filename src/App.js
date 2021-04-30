@@ -7,39 +7,36 @@ import ShopPage from "./pages/shop/shop.component";
 import Header from "./components/header/header.component.jsx";
 import CheckoutPage from "./pages/checkout/checkout.component.jsx";
 import SignInAndSignUp from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
-
-import { setCurrentUser } from "./redux/user/user.actions";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import { createStructuredSelector } from "reselect";
-import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { selectCurrentUser } from "./redux/user/user.selectors";
+import { checkUserSession } from "./redux/user/user.actions";
 
 class App extends Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    const { setCurrentUser } = this.props;
+    const {checkUserSession} = this.props;
+    checkUserSession();
     //onAuthStateChanged is a  listener to auth change, means every time the user sign in or out it will be trigger
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
-      if (userAuth) {
-        const userRef = await createUserProfileDocument(userAuth);
-
-        //onSnapshot is a listener that fired everytime that this specific document has changed or in the first time. It is like componentDidMount & componentDidUpdate
-        userRef.onSnapshot((snapShot) => {
-          setCurrentUser({
-            id: snapShot.id,
-            ...snapShot.data(),
-          });
-        });
-        return;
-      }
-
-      setCurrentUser(userAuth);
-    });
+    // this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+    //   if (userAuth) {
+    //     const userRef = await createUserProfileDocument(userAuth);
+    //     //onSnapshot is a listener that fired everytime that this specific document has changed or in the first time. It is like componentDidMount & componentDidUpdate
+    //     userRef.onSnapshot((snapShot) => {
+    //       setCurrentUser({
+    //         id: snapShot.id,
+    //         ...snapShot.data(),
+    //       });
+    //     });
+    //     return;
+    //   }
+    //   setCurrentUser(userAuth);
+    // });
   }
 
   componentWillUnmount() {
-    this.unsubscribeFromAuth();
+    // this.unsubscribeFromAuth();
   }
 
   render() {
@@ -72,6 +69,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+  checkUserSession: () => dispatch(checkUserSession()),
 });
+
 export default connect(mapStateToProps, mapDispatchToProps)(App);
