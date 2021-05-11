@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import "./App.css";
 
@@ -12,35 +12,14 @@ import { createStructuredSelector } from "reselect";
 import { selectCurrentUser } from "./redux/user/user.selectors";
 import { checkUserSession } from "./redux/user/user.actions";
 
-class App extends Component {
-  unsubscribeFromAuth = null;
+const App =( { checkUserSession, currentUser } )=> {
 
-  componentDidMount() {
-    const {checkUserSession} = this.props;
+  useEffect(()=>{
     checkUserSession();
-    //onAuthStateChanged is a  listener to auth change, means every time the user sign in or out it will be trigger
-    // this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
-    //   if (userAuth) {
-    //     const userRef = await createUserProfileDocument(userAuth);
-    //     //onSnapshot is a listener that fired everytime that this specific document has changed or in the first time. It is like componentDidMount & componentDidUpdate
-    //     userRef.onSnapshot((snapShot) => {
-    //       setCurrentUser({
-    //         id: snapShot.id,
-    //         ...snapShot.data(),
-    //       });
-    //     });
-    //     return;
-    //   }
-    //   setCurrentUser(userAuth);
-    // });
-  }
+  },[checkUserSession])
 
-  componentWillUnmount() {
-    // this.unsubscribeFromAuth();
-  }
 
-  render() {
-    return (
+  return(
       <BrowserRouter>
         <Header />
         <Switch>
@@ -51,7 +30,7 @@ class App extends Component {
             exact
             path="/signin"
             render={() =>
-              this.props.currentUser ? (
+              currentUser ? (
                 <Redirect to={{ pathname: "/" }} />
               ) : (
                 <SignInAndSignUp />
@@ -59,9 +38,9 @@ class App extends Component {
             }
           />
         </Switch>
-      </BrowserRouter>
+      </BrowserRouter >
     );
-  }
+
 }
 
 const mapStateToProps = createStructuredSelector({
